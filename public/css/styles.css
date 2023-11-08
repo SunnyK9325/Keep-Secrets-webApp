@@ -12,5 +12,10 @@ body {
   text-align: center;
   font-size: 2rem;
   color: #fff;
-  background-color: #000;
+  background-color: #176B87;
+  border-radius: 10px;
+}
+
+h1 {
+  margin-bottom: 50px;
 }
