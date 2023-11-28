@@ -25,9 +25,6 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-
-// mongoose.connect("mongodb+srv://sunny9325:brago9325@cluster0.legztwk.mongodb.net/?retryWrites=true&w=majority/keepSecretsDB", {useNewUrlParser:true});
-
 const userSchema = new mongoose.Schema({
     email: String,
     password: String,
@@ -59,7 +56,7 @@ passport.deserializeUser(function(user, done) {
 passport.use(new GoogleStrategy({
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/auth/google/secrets",
+    callbackURL: process.env.CALLBACK_URL || "http://localhost:3000/auth/google/secrets",
     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo" //! From GitHub Issues because of G+ Deprecation 
   },
   function(accessToken, refreshToken, profile, cb) {
@@ -77,7 +74,7 @@ app.get("/", function(req, res){
 
 // login route
 
-app.route("/login")
+app.route(`${process.env.BASE_URL}/login`)
 
 .get(function(req, res){
     res.render("login");
@@ -104,7 +101,7 @@ app.route("/login")
 
 // register route
 
-app.route("/register")
+app.route(`${process.env.BASE_URL}/register`)
 
 .get(function(req, res){
     res.render("register");
@@ -127,19 +124,19 @@ app.route("/register")
 
 // Google authentication
 
-app.get("/auth/google", 
+app.get(`${process.env.BASE_URL}/auth/google`, 
 passport.authenticate("google", {scope: ["profile"]}));
 
-app.get("/auth/google/secrets", 
-  passport.authenticate("google", { failureRedirect: "/login" }), (req, res)=> {
+app.get(`${process.env.BASE_URL}/auth/google/secrets`, 
+  passport.authenticate("google", { failureRedirect: `${process.env.BASE_URL}/login` }), (req, res)=> {
     // Successful authentication, redirect secrets page.
-    res.redirect("/secrets");
+    res.redirect(`${process.env.BASE_URL}/secrets`);
   });
 
 
 // secrets route
 
-app.get("/secrets", function(req, res) {
+app.get(`${process.env.BASE_URL}/secrets`, function(req, res) {
     User.find({secret: {$ne:null}})
     .then((foundUsers)=>{
         res.render("secrets", {userWithSecrets: foundUsers});
@@ -151,7 +148,7 @@ app.get("/secrets", function(req, res) {
 
 // logout route
 
-app.get("/logout", function(req, res){
+app.get(`${process.env.BASE_URL}/logout`, function(req, res){
     req.logOut((err) => {
         if (err) {
             res.send(err);
@@ -163,14 +160,14 @@ app.get("/logout", function(req, res){
 
 // submit route
 
-app.route("/submit")
+app.route(`${process.env.BASE_URL}/submit`)
 
 .get((req, res)=>{
     if(req.isAuthenticated()) {
         res.render("submit");
     }
     else {
-        res.redirect("/login");
+        res.redirect(`${process.env.BASE_URL}/login`);
     }
 })
 
@@ -181,7 +178,7 @@ app.route("/submit")
             if(foundUser) {
                 foundUser.secret = submittedSecret;
                 foundUser.save();
-                res.redirect("/secrets");
+                res.redirect(`${process.env.BASE_URL}/secrets`);
             }
         })
         .catch((err)=>{
