@@ -1,7 +1,7 @@
 # Keep-Secrets-webApp
 
 
-**Features**:  
+**###Features**:  
 – Developed "Keep Secrets" a platform where users can share their secrets anonymously.  
 – Implemented using Node.js and Express along with EJS templating and MongoDB for efficient data management.  
 – Designed an intuitive frontend with Bootstrap for a seamless user experience.  
